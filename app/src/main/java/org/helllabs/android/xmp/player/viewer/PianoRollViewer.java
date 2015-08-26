@@ -97,7 +97,7 @@ public class PianoRollViewer extends Viewer {
 		final float noteRadius = NOTE_RADIUS_COEFFICIENT * Math.min(noteHeight, noteWidth);
 
 		// Clear screen
-		canvas.drawColor(Color.argb(128, 0, 0, 0));
+		canvas.drawColor(Color.argb(255, 0, 0, 0));
 
 		//No header to draw yet
 
