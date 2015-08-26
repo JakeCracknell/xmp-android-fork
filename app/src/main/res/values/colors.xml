@@ -12,4 +12,13 @@
 
     <color name="pressed_color">#606060</color>
     <color name="drag_handle_color">#202020</color>
+
+    <color name="track0_color">#FF0000</color>
+    <color name="track1_color">#808000</color>
+    <color name="track2_color">#80FFFF</color>
+    <color name="track3_color">#FFFF00</color>
+    <color name="track4_color">#00CC66</color>
+    <color name="track5_color">#00CCCC</color>
+    <color name="track6_color">#FF8000</color>
+    <color name="track7_color">#FF99FF</color>
 </resources>

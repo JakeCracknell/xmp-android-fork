@@ -1,11 +1,13 @@
 package org.helllabs.android.xmp.player.viewer;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.RemoteException;
 
 import org.helllabs.android.xmp.R;
@@ -36,10 +38,15 @@ public class PianoRollViewer extends Viewer {
 
 		fontSize = getResources().getDimensionPixelSize(R.dimen.patternview_font_size);
 
-		for (int channel = 0; channel < MAX_CHANNELS; channel++) {
-			notePaint[channel] = new Paint();
-			notePaint[channel].setARGB(255, 255, 0, 0);
-			notePaint[channel].setAntiAlias(true);
+		for (int channel = 0; channel < MAX_CHANNELS; channel += 8) {
+			setupChannelColor(channel + 0, getResources().getColor(R.color.track0_color));
+			setupChannelColor(channel + 1, getResources().getColor(R.color.track1_color));
+			setupChannelColor(channel + 2, getResources().getColor(R.color.track2_color));
+			setupChannelColor(channel + 3, getResources().getColor(R.color.track3_color));
+			setupChannelColor(channel + 4, getResources().getColor(R.color.track4_color));
+			setupChannelColor(channel + 5, getResources().getColor(R.color.track5_color));
+			setupChannelColor(channel + 6, getResources().getColor(R.color.track6_color));
+			setupChannelColor(channel + 7, getResources().getColor(R.color.track7_color));
 		}
 
 		insPaint = new Paint();
@@ -131,14 +138,21 @@ public class PianoRollViewer extends Viewer {
 		}
 	}
 
+	private void setupChannelColor(int channel, int color) {
+		notePaint[channel] = new Paint();
+		notePaint[channel].setColor(color);
+		notePaint[channel].setAntiAlias(true);
+	}
+
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
 		final int channelCount = modVars[3];
 		final int currentPattern = info.values[1];
 		final int currentRow = info.values[2];
 		final int rowCount = info.values[3];
-		final float noteHeight = canvasHeight / MAX_NOTES;
-		final float noteWidth = canvasWidth / rowCount;
-		final float noteRadius = 5;
+		final float noteHeight = (float) canvasHeight / MAX_NOTES;
+		final float noteWidth = (float) canvasWidth / rowCount;
+		final float noteRadius = 1;
 
 		// Clear screen
 		canvas.drawColor(Color.BLACK);
@@ -156,8 +170,8 @@ public class PianoRollViewer extends Viewer {
 				if (rowNotes[channel] != 0) {
 					float left = row * noteWidth;
 					float top = (canvasHeight - noteHeight) - rowNotes[channel] * noteHeight;
-					canvas.drawRect(left, top, left + noteWidth, top + noteHeight, notePaint[channel]);
-					//canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
+
+					canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
 				}
 			}
 		}
