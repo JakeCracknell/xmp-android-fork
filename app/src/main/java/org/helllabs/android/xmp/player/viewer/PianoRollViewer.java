@@ -1,6 +1,5 @@
 package org.helllabs.android.xmp.player.viewer;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,14 +13,13 @@ import org.helllabs.android.xmp.R;
 import org.helllabs.android.xmp.player.Util;
 import org.helllabs.android.xmp.service.ModInterface;
 
-import java.util.Random;
-
 
 // http://developer.android.com/guide/topics/graphics/2d-graphics.html
 
 public class PianoRollViewer extends Viewer {
-	private static final int MAX_NOTES = 120;
+	private static final int MAX_NOTES = 96;
 	private static final int MAX_CHANNELS = 64;
+	private static final float NOTE_RADIUS_COEFFICIENT = 0.4f;
 	private final Paint headerPaint, headerTextPaint, insPaint;
 	private final Paint barPaint, muteNotePaint, muteInsPaint;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
@@ -144,7 +142,6 @@ public class PianoRollViewer extends Viewer {
 		notePaint[channel].setAntiAlias(true);
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
 		final int channelCount = modVars[3];
 		final int currentPattern = info.values[1];
@@ -152,7 +149,7 @@ public class PianoRollViewer extends Viewer {
 		final int rowCount = info.values[3];
 		final float noteHeight = (float) canvasHeight / MAX_NOTES;
 		final float noteWidth = (float) canvasWidth / rowCount;
-		final float noteRadius = 1;
+		final float noteRadius = NOTE_RADIUS_COEFFICIENT * Math.min(noteHeight, noteWidth);
 
 		// Clear screen
 		canvas.drawColor(Color.BLACK);
@@ -167,11 +164,16 @@ public class PianoRollViewer extends Viewer {
 			} catch (RemoteException e) { }
 
 			for (int channel = 0; channel < channelCount; channel++) {
-				if (rowNotes[channel] != 0) {
+				int rowNote = rowNotes[channel] - 12;
+				if (rowNote != -12 && rowNote < MAX_NOTES) {
 					float left = row * noteWidth;
-					float top = (canvasHeight - noteHeight) - rowNotes[channel] * noteHeight;
+					float top = (canvasHeight - noteHeight) - rowNote * noteHeight;
 
-					canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
+					} else {
+						canvas.drawRect(left, top, left + noteWidth, top + noteHeight, notePaint[channel]);
+					}
 				}
 			}
 		}
