@@ -307,6 +307,8 @@ public class FilelistActivity extends BasePlaylistActivity implements PlaylistAd
 			}
 		}
 		Collections.sort(list);
+		PlaylistUtils.renumberIds(list);
+
 		mPlaylistAdapter.addList(list);
 		mPlaylistAdapter.notifyDataSetChanged();
 
