@@ -91,6 +91,8 @@ public abstract class Viewer extends SurfaceView implements SurfaceHolder.Callba
 			velX = velY = 0;		// stop fling
 			return true;
 		}
+
+
 	}
 
 	protected void updateScroll() {		// Hmpf, reinventing the wheel instead of using Scroller

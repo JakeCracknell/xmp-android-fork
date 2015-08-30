@@ -13,13 +13,18 @@ import org.helllabs.android.xmp.service.ModInterface;
 public class PianoRollViewer extends Viewer {
 	private static final int MAX_NOTES = 96;
 	private static final int MAX_CHANNELS = 64;
-	private static float PLAYED_NOTE_SIZE_COEFFICIENT = 1.3f;
+	private static final float PLAYED_NOTE_SIZE_COEFFICIENT = 1.3f;
+	private static final float CHANNEL_SCROLL_WIDTH_COEFFICIENT = 1.5f;
 	private static final float NOTE_RADIUS_COEFFICIENT = 0.4f;
+	private static final int DRAW_ALL_CHANNELS_CODE = -1;
+	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
 	private final byte[] rowNotes = new byte[64];
 	private final byte[] rowInstruments = new byte[64];
 	private int oldRow, oldOrd, oldPosX;
+	private int channelToDraw = DRAW_ALL_CHANNELS_CODE;
+	private int maxChannelScrollX;
 
 	public PianoRollViewer(final Context context) {
 		super(context);
@@ -46,6 +51,10 @@ public class PianoRollViewer extends Viewer {
 		oldRow = -1;
 		oldOrd = -1;
 		oldPosX = -1;
+		if (SCROLLABLE_CHANNELS_ENABLED) {
+			maxChannelScrollX = (int) (canvasWidth * CHANNEL_SCROLL_WIDTH_COEFFICIENT);
+			setMaxX(maxChannelScrollX);
+		}
 	}
 
 	@Override
@@ -96,6 +105,7 @@ public class PianoRollViewer extends Viewer {
 		final float noteHeight = (float) canvasHeight / MAX_NOTES;
 		final float noteWidth = (float) canvasWidth / rowCount;
 		final float noteRadius = NOTE_RADIUS_COEFFICIENT * Math.min(noteHeight, noteWidth);
+		determineChannelToDraw();
 
 		// Clear screen
 		canvas.drawColor(Color.argb(255, 0, 0, 0));
@@ -110,30 +120,43 @@ public class PianoRollViewer extends Viewer {
 			} catch (RemoteException e) { }
 
 			for (int channel = 0; channel < channelCount; channel++) {
-				int rowNote = rowNotes[channel] - 12;
-				if (rowNote != -12 && rowNote < MAX_NOTES) {
-					float left = row * noteWidth;
-					float top = (canvasHeight - noteHeight) - rowNote * noteHeight;
+				if (channelToDraw == DRAW_ALL_CHANNELS_CODE || channelToDraw % channelCount == channel) {
+					int rowNote = rowNotes[channel] - 12;
+					if (rowNote != -12 && rowNote < MAX_NOTES) {
+						float left = row * noteWidth;
+						float top = (canvasHeight - noteHeight) - rowNote * noteHeight;
 
-					if (row != currentRow) {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
+						if (row != currentRow) {
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+								canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight,
+										noteRadius, noteRadius, notePaint[channel]);
+							} else {
+								canvas.drawRect(left, top, left + noteWidth, top + noteHeight,
+										notePaint[channel]);
+							}
 						} else {
-							canvas.drawRect(left, top, left + noteWidth, top + noteHeight, notePaint[channel]);
+							float extraMarginWidth = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteWidth;
+							float extraMarginHeight = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteHeight;
+							canvas.drawRect(left - extraMarginWidth, top - extraMarginHeight,
+									left + noteWidth + extraMarginWidth,
+									top + noteHeight + extraMarginHeight, notePaint[channel]);
 						}
-					} else {
-						float extraMarginWidth = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteWidth;
-						float extraMarginHeight = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteHeight;
-						canvas.drawRect(left - extraMarginWidth, top - extraMarginHeight,
-								left + noteWidth + extraMarginWidth,
-								top + noteHeight + extraMarginHeight, notePaint[channel]);
 					}
-
 				}
 			}
 		}
 
 		//Draw Position Marker
 		canvas.drawRect(currentRow * noteWidth, 0, currentRow * noteWidth + noteWidth, canvasHeight, barPaint);
+	}
+
+	public void determineChannelToDraw() {
+		if (!SCROLLABLE_CHANNELS_ENABLED || posX == 0 || posX == maxChannelScrollX) {
+			channelToDraw = DRAW_ALL_CHANNELS_CODE;
+		} else {
+			int touchX = (int) (8 * posX / canvasWidth);
+			int touchY = (int) (8 * posY / canvasHeight);
+			channelToDraw = touchX + (8 * touchY);
+		}
 	}
 }
