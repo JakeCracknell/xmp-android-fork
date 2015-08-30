@@ -172,4 +172,6 @@
     <string name="download_cancelled">Download cancelled</string>
     <string name="file_downloaded">Module downloaded</string>
     <string name="menu_help">Help</string>
+    <string name="button_prev_pattern">Previous Pattern</string>
+    <string name="button_next_pattern">Next Pattern</string>
 </resources>

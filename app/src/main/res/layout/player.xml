@@ -103,6 +103,16 @@
 		android:paddingRight="2dp"
 		android:background="#181818">
 
+		<ImageButton
+			style="@style/ButtonTheme"
+			android:id="@+id/backPattern"
+			android:src="@drawable/back"
+			android:layout_width="wrap_content"
+			android:layout_height="40dp"
+			android:onClick="backPatternButtonListener"
+			android:contentDescription="@string/button_prev_pattern"
+			android:focusableInTouchMode="false" />
+
 		<SeekBar android:id="@+id/seek"
 			android:gravity="bottom"
 			android:layout_width="wrap_content"
@@ -111,10 +121,18 @@
 			android:paddingBottom="10dp"
 			android:paddingTop="10dp" />
 
-		<ImageButton android:id="@+id/loop"
-			android:layout_weight="0.05"
+		<ImageButton
+			style="@style/ButtonTheme"
+			android:id="@+id/forwardPattern"
+			android:src="@drawable/forward"
 			android:layout_width="wrap_content"
-			android:layout_height="32dip"
+			android:layout_height="40dp"
+			android:contentDescription="@string/button_next_pattern"
+			android:onClick="forwardPatternButtonListener" />
+
+		<ImageButton android:id="@+id/loop"
+			android:layout_width="wrap_content"
+			android:layout_height="40dp"
 			style="@style/ButtonTheme"
 			android:onClick="loopButtonListener"
 			android:contentDescription="@string/button_mod_loop" />
@@ -135,6 +153,7 @@
 			android:onClick="backButtonListener"
 			style="@style/ButtonTheme"
 			android:contentDescription="@string/button_prev" />
+
 		<ImageButton android:id="@+id/stop"
 			android:src="@drawable/stop"
 			android:layout_weight="1.0"
@@ -143,6 +162,7 @@
 			android:onClick="stopButtonListener"
 			style="@style/ButtonTheme"
 			android:contentDescription="@string/button_stop" />
+
 		<ImageButton android:id="@+id/play"
 			android:src="@drawable/pause"
 			android:layout_weight="1.0"
@@ -151,6 +171,7 @@
 			android:onClick="playButtonListener"
 			style="@style/ButtonTheme"
 			android:contentDescription="@string/button_play_pause" />
+
 		<ImageButton android:id="@+id/forward"
 			android:src="@drawable/forward"
 			android:layout_weight="1.0"

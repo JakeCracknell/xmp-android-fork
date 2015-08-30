@@ -646,6 +646,43 @@ public class PlayerActivity extends Activity {
 		}
 	}
 
+	public void forwardPatternButtonListener(final View view) {
+		synchronized (playerLock) {
+			Log.d(TAG, "Next pattern button pressed");
+			if (modPlayer != null) {
+				try {
+					int currentPatternPosition = info.values[0];
+					long currentPlayTime = playTime * 100;
+					long fwdAmount = 100;
+					while (info.values[0] == currentPatternPosition) {
+						Log.d(TAG, "Trying to seek by extra time (ms): " + fwdAmount);
+						modPlayer.seek(currentPlayTime + fwdAmount);
+						modPlayer.getInfo(info.values);
+						fwdAmount *= 2;
+					}
+					playTime = modPlayer.time() / 100;
+					unpause();
+				} catch (RemoteException e) {
+					Log.e(TAG, "Can't seek ahead");
+				}
+			}
+		}
+	}
+
+	public void backPatternButtonListener(final View view) {
+		synchronized (playerLock) {
+			Log.d(TAG, "Back pattern button pressed");
+			if (modPlayer != null) {
+				try {
+					modPlayer.seek(playTime * 100);
+					unpause();
+				} catch (RemoteException e) {
+					Log.e(TAG, "Can't seek back");
+				}
+			}
+		}
+	}
+
 	// Life cycle
 
 	@Override
