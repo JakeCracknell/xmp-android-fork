@@ -89,7 +89,7 @@ public class PlayerActivity extends Activity {
 	private Viewer.Info info;
 	private final int[] modVars = new int[10];
 	private final int[] seqVars = new int[16];		// this is MAX_SEQUENCES defined in common.h
-	private static final int FRAME_RATE = 25;
+	private static final int FRAME_RATE = 60;
 	private static boolean stopUpdate;				// this MUST be static (volatile doesn't work!)
 	private static boolean canChangeViewer;
 	private int currentViewer;
