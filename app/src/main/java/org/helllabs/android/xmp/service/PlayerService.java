@@ -639,6 +639,16 @@ public final class PlayerService extends Service implements OnAudioFocusChangeLi
 			return Xmp.getComment() != null;
 		}
 
+		@Override
+		public void nextPosition() throws RemoteException {
+			Xmp.nextPosition();
+		}
+
+		@Override
+		public void prevPosition() throws RemoteException {
+			Xmp.prevPosition();
+		}
+
 		// File management
 
 		public boolean deleteFile() {

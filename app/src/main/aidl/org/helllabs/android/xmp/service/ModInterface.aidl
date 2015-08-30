@@ -32,7 +32,9 @@ interface ModInterface {
 	void allowRelease();
 	void getSeqVars(out int[] vars);
 	boolean hasComment();
-	
+	void nextPosition();
+	void prevPosition();
+
 	void registerCallback(PlayerCallback cb);
 	void unregisterCallback(PlayerCallback cb);
 }
