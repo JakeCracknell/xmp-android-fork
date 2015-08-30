@@ -13,6 +13,7 @@ import org.helllabs.android.xmp.service.ModInterface;
 public class PianoRollViewer extends Viewer {
 	private static final int MAX_NOTES = 96;
 	private static final int MAX_CHANNELS = 64;
+	private static float PLAYED_NOTE_SIZE_COEFFICIENT = 1.3f;
 	private static final float NOTE_RADIUS_COEFFICIENT = 0.4f;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
@@ -114,11 +115,20 @@ public class PianoRollViewer extends Viewer {
 					float left = row * noteWidth;
 					float top = (canvasHeight - noteHeight) - rowNote * noteHeight;
 
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
+					if (row != currentRow) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight, noteRadius, noteRadius, notePaint[channel]);
+						} else {
+							canvas.drawRect(left, top, left + noteWidth, top + noteHeight, notePaint[channel]);
+						}
 					} else {
-						canvas.drawRect(left, top, left + noteWidth, top + noteHeight, notePaint[channel]);
+						float extraMarginWidth = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteWidth;
+						float extraMarginHeight = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteHeight;
+						canvas.drawRect(left - extraMarginWidth, top - extraMarginHeight,
+								left + noteWidth + extraMarginWidth,
+								top + noteHeight + extraMarginHeight, notePaint[channel]);
 					}
+
 				}
 			}
 		}
