@@ -20,6 +20,7 @@ public class PianoRollViewer extends Viewer {
 	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
+	private final Paint mutedPaint;
 	private final byte[] rowNotes = new byte[64];
 	private final byte[] rowInstruments = new byte[64];
 	private int oldRow, oldOrd, oldPosX;
@@ -42,6 +43,8 @@ public class PianoRollViewer extends Viewer {
 
 		barPaint = new Paint();
 		barPaint.setARGB(50, 255, 255, 255);
+		mutedPaint = new Paint();
+		mutedPaint.setARGB(255, 0, 0, 0);
 	}
 	
 	@Override
@@ -134,12 +137,15 @@ public class PianoRollViewer extends Viewer {
 								canvas.drawRect(left, top, left + noteWidth, top + noteHeight,
 										notePaint[channel]);
 							}
-						} else {
+						} else if (!isMuted[channel]) {
 							float extraMarginWidth = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteWidth;
 							float extraMarginHeight = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteHeight;
 							canvas.drawRect(left - extraMarginWidth, top - extraMarginHeight,
 									left + noteWidth + extraMarginWidth,
 									top + noteHeight + extraMarginHeight, notePaint[channel]);
+						}
+						if (isMuted[channel]) {
+							canvas.drawRect(left + 1, top + 1, left + noteWidth - 1, top + noteHeight - 1, mutedPaint);
 						}
 					}
 				}
