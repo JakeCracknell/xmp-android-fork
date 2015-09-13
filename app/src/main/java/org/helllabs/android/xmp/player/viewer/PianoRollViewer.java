@@ -20,7 +20,7 @@ public class PianoRollViewer extends Viewer {
 	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
-	private final Paint mutedPaint;
+	private final int backgroundColor;
 	private final byte[] rowNotes = new byte[64];
 	private final byte[] rowInstruments = new byte[64];
 	private int oldRow, oldOrd, oldPosX;
@@ -41,10 +41,9 @@ public class PianoRollViewer extends Viewer {
 			setupChannelPaint(channel + 7, getResources().getColor(R.color.track7_color));
 		}
 
+		backgroundColor = Color.argb(255, 0, 0, 0);
 		barPaint = new Paint();
 		barPaint.setARGB(50, 255, 255, 255);
-		mutedPaint = new Paint();
-		mutedPaint.setARGB(255, 0, 0, 0);
 	}
 	
 	@Override
@@ -111,10 +110,7 @@ public class PianoRollViewer extends Viewer {
 		determineChannelToDraw();
 
 		// Clear screen
-		canvas.drawColor(Color.argb(255, 0, 0, 0));
-
-		//No header to draw yet
-
+		canvas.drawColor(backgroundColor);
 
 		//Draw Notes
 		for (int row = 0; row < rowCount; row++) {
@@ -123,7 +119,9 @@ public class PianoRollViewer extends Viewer {
 			} catch (RemoteException e) { }
 
 			for (int channel = 0; channel < channelCount; channel++) {
-				if (channelToDraw == DRAW_ALL_CHANNELS_CODE || channelToDraw % channelCount == channel) {
+				if (!isMuted[channel] &&
+						(channelToDraw == DRAW_ALL_CHANNELS_CODE ||
+								channelToDraw % channelCount == channel)) {
 					int rowNote = rowNotes[channel] - 12;
 					if (rowNote != -12 && rowNote < MAX_NOTES) {
 						float left = row * noteWidth;
@@ -137,22 +135,19 @@ public class PianoRollViewer extends Viewer {
 								canvas.drawRect(left, top, left + noteWidth, top + noteHeight,
 										notePaint[channel]);
 							}
-						} else if (!isMuted[channel]) {
+						} else {
 							float extraMarginWidth = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteWidth;
 							float extraMarginHeight = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteHeight;
 							canvas.drawRect(left - extraMarginWidth, top - extraMarginHeight,
 									left + noteWidth + extraMarginWidth,
 									top + noteHeight + extraMarginHeight, notePaint[channel]);
 						}
-						if (isMuted[channel]) {
-							canvas.drawRect(left + 1, top + 1, left + noteWidth - 1, top + noteHeight - 1, mutedPaint);
-						}
 					}
 				}
 			}
 		}
 
-		//Draw Position Marker
+		//Draw Position Marker Bar
 		canvas.drawRect(currentRow * noteWidth, 0, currentRow * noteWidth + noteWidth, canvasHeight, barPaint);
 	}
 
