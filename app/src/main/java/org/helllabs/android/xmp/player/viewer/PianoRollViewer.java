@@ -20,7 +20,7 @@ public class PianoRollViewer extends Viewer {
 	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
-	private final int backgroundColor;
+	private final int backgroundColor = Color.BLACK;
 	private final byte[] rowNotes = new byte[64];
 	private final byte[] rowInstruments = new byte[64];
 	private int oldRow, oldOrd, oldPosX;
@@ -41,7 +41,6 @@ public class PianoRollViewer extends Viewer {
 			setupChannelPaint(channel + 7, getResources().getColor(R.color.track7_color));
 		}
 
-		backgroundColor = Color.argb(255, 0, 0, 0);
 		barPaint = new Paint();
 		barPaint.setARGB(50, 255, 255, 255);
 	}
