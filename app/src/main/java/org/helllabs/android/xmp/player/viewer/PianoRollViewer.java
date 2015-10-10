@@ -19,6 +19,7 @@ public class PianoRollViewer extends Viewer {
 	private static final int DRAW_ALL_CHANNELS_CODE = -1;
 	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
 	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
+	private final Paint[] notePaint2 = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
 	private final int backgroundColor = Color.BLACK;
 	private final byte[] rowNotes = new byte[64];
@@ -96,6 +97,10 @@ public class PianoRollViewer extends Viewer {
 		notePaint[channel] = new Paint();
 		notePaint[channel].setColor(color);
 		notePaint[channel].setAntiAlias(true);
+		notePaint2[channel] = new Paint();
+		notePaint2[channel].setColor(color);
+		notePaint2[channel].setAntiAlias(true);
+		notePaint2[channel].setStyle(Paint.Style.STROKE);
 	}
 
 	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
@@ -126,20 +131,19 @@ public class PianoRollViewer extends Viewer {
 						float left = row * noteWidth;
 						float top = (canvasHeight - noteHeight) - rowNote * noteHeight;
 
+						float adjNoteWidth = noteWidth * info.volumes[channel]/64;
 						if (row != currentRow) {
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight,
+								canvas.drawRoundRect(left, top, left + adjNoteWidth, top + noteHeight,
 										noteRadius, noteRadius, notePaint[channel]);
+								canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight,
+										noteRadius, noteRadius, notePaint2[channel]);
 							} else {
-								canvas.drawRect(left, top, left + noteWidth, top + noteHeight,
+								canvas.drawRect(left, top, left + adjNoteWidth, top + noteHeight,
 										notePaint[channel]);
+								canvas.drawRect(left, top, left + noteWidth, top + noteHeight,
+										notePaint2[channel]);
 							}
-						} else {
-							float extraMarginWidth = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteWidth;
-							float extraMarginHeight = (PLAYED_NOTE_SIZE_COEFFICIENT - 1) * noteHeight;
-							canvas.drawRect(left - extraMarginWidth, top - extraMarginHeight,
-									left + noteWidth + extraMarginWidth,
-									top + noteHeight + extraMarginHeight, notePaint[channel]);
 						}
 					}
 				}
