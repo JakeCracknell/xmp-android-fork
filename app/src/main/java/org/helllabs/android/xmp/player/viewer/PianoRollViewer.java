@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
 import android.os.RemoteException;
 
@@ -18,8 +19,9 @@ public class PianoRollViewer extends Viewer {
 	private static final float NOTE_RADIUS_COEFFICIENT = 0.4f;
 	private static final int DRAW_ALL_CHANNELS_CODE = -1;
 	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
-	private final Paint[] notePaint = new Paint[MAX_CHANNELS];
-	private final Paint[] notePaint2 = new Paint[MAX_CHANNELS];
+	private static final boolean ROUNDED_RECTANGLES_ENABLED = false;
+	private final Paint[] noteFillPaint = new Paint[MAX_CHANNELS];
+	private final Paint[] noteOutlinePaint = new Paint[MAX_CHANNELS];
 	private final Paint barPaint;
 	private final int backgroundColor = Color.BLACK;
 	private final byte[] rowNotes = new byte[64];
@@ -94,13 +96,13 @@ public class PianoRollViewer extends Viewer {
 	}
 
 	private void setupChannelPaint(int channel, int color) {
-		notePaint[channel] = new Paint();
-		notePaint[channel].setColor(color);
-		notePaint[channel].setAntiAlias(true);
-		notePaint2[channel] = new Paint();
-		notePaint2[channel].setColor(color);
-		notePaint2[channel].setAntiAlias(true);
-		notePaint2[channel].setStyle(Paint.Style.STROKE);
+		noteFillPaint[channel] = new Paint();
+		noteFillPaint[channel].setColor(color);
+		noteFillPaint[channel].setAntiAlias(true);
+		noteOutlinePaint[channel] = new Paint();
+		noteOutlinePaint[channel].setColor(color);
+		noteOutlinePaint[channel].setAntiAlias(true);
+		noteOutlinePaint[channel].setStyle(Paint.Style.STROKE);
 	}
 
 	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
@@ -131,18 +133,18 @@ public class PianoRollViewer extends Viewer {
 						float left = row * noteWidth;
 						float top = (canvasHeight - noteHeight) - rowNote * noteHeight;
 
-						float adjNoteWidth = noteWidth * info.volumes[channel]/64;
+						float scaleFactor = (float) info.volumes[channel] / 64;
 						if (row != currentRow) {
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								canvas.drawRoundRect(left, top, left + adjNoteWidth, top + noteHeight,
-										noteRadius, noteRadius, notePaint[channel]);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && ROUNDED_RECTANGLES_ENABLED) {
 								canvas.drawRoundRect(left, top, left + noteWidth, top + noteHeight,
-										noteRadius, noteRadius, notePaint2[channel]);
+										noteRadius, noteRadius, noteOutlinePaint[channel]);
+								canvas.drawRoundRect(makeScaledRectangle(left, top, noteWidth, noteHeight, scaleFactor),
+										noteRadius, noteRadius, noteFillPaint[channel]);
 							} else {
-								canvas.drawRect(left, top, left + adjNoteWidth, top + noteHeight,
-										notePaint[channel]);
 								canvas.drawRect(left, top, left + noteWidth, top + noteHeight,
-										notePaint2[channel]);
+										noteOutlinePaint[channel]);
+								canvas.drawRect(makeScaledRectangle(left, top, noteWidth, noteHeight, scaleFactor),
+										noteFillPaint[channel]);
 							}
 						}
 					}
@@ -152,6 +154,12 @@ public class PianoRollViewer extends Viewer {
 
 		//Draw Position Marker Bar
 		canvas.drawRect(currentRow * noteWidth, 0, currentRow * noteWidth + noteWidth, canvasHeight, barPaint);
+	}
+
+	private RectF makeScaledRectangle(float left, float top, float width, float height, float scaleFactor) {
+		RectF rectF = new RectF(left, top, left + width * scaleFactor, top + height * scaleFactor);
+		rectF.offset((width - rectF.width()) / 2, (height - rectF.height()) / 2);
+		return rectF;
 	}
 
 	public void determineChannelToDraw() {
