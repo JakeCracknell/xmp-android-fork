@@ -258,7 +258,11 @@ public class PlayerActivity extends Activity {
 				synchronized (playerLock) {
 					if (modPlayer != null) {
 						try {
-							modPlayer.getInfo(info.values);							
+							modPlayer.getInfo(info.values);
+
+							//Speed(5) + row count(3) 0 => still initialising
+							//Just row count(3) 0. Overflow and should be 256
+							if (info.values[3] == 0 && info.values[5] != 0) { info.values[3] = 256; }
 							info.time = modPlayer.time() / 1000;
 
 							modPlayer.getChannelData(info.volumes, info.finalvols, info.pans,
