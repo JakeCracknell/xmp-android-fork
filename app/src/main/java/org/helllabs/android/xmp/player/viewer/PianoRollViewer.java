@@ -14,11 +14,8 @@ import org.helllabs.android.xmp.service.ModInterface;
 public class PianoRollViewer extends Viewer {
 	private static final int MAX_NOTES = 96;
 	private static final int MAX_CHANNELS = 64;
-	private static final float PLAYED_NOTE_SIZE_COEFFICIENT = 1.3f;
-	private static final float CHANNEL_SCROLL_WIDTH_COEFFICIENT = 1.5f;
 	private static final float NOTE_RADIUS_COEFFICIENT = 0.4f;
 	private static final int DRAW_ALL_CHANNELS_CODE = -1;
-	private static final boolean SCROLLABLE_CHANNELS_ENABLED = false;
 	private static final boolean ROUNDED_RECTANGLES_ENABLED = false;
 	private final Paint[] noteFillPaint = new Paint[MAX_CHANNELS];
 	private final Paint[] noteOutlinePaint = new Paint[MAX_CHANNELS];
@@ -28,7 +25,6 @@ public class PianoRollViewer extends Viewer {
 	private final byte[] rowInstruments = new byte[64];
 	private int oldRow, oldOrd, oldPosX;
 	private int channelToDraw = DRAW_ALL_CHANNELS_CODE;
-	private int maxChannelScrollX;
 
 	public PianoRollViewer(final Context context) {
 		super(context);
@@ -55,10 +51,6 @@ public class PianoRollViewer extends Viewer {
 		oldRow = -1;
 		oldOrd = -1;
 		oldPosX = -1;
-		if (SCROLLABLE_CHANNELS_ENABLED) {
-			maxChannelScrollX = (int) (canvasWidth * CHANNEL_SCROLL_WIDTH_COEFFICIENT);
-			setMaxX(maxChannelScrollX);
-		}
 	}
 
 	@Override
@@ -113,7 +105,6 @@ public class PianoRollViewer extends Viewer {
 		final float noteHeight = (float) canvasHeight / MAX_NOTES;
 		final float noteWidth = (float) canvasWidth / rowCount;
 		final float noteRadius = NOTE_RADIUS_COEFFICIENT * Math.min(noteHeight, noteWidth);
-		determineChannelToDraw();
 
 		// Clear screen
 		canvas.drawColor(backgroundColor);
@@ -160,15 +151,5 @@ public class PianoRollViewer extends Viewer {
 		RectF rectF = new RectF(left, top, left + width * scaleFactor, top + height * scaleFactor);
 		rectF.offset((width - rectF.width()) / 2, (height - rectF.height()) / 2);
 		return rectF;
-	}
-
-	public void determineChannelToDraw() {
-		if (!SCROLLABLE_CHANNELS_ENABLED || posX == 0 || posX == maxChannelScrollX) {
-			channelToDraw = DRAW_ALL_CHANNELS_CODE;
-		} else {
-			int touchX = (int) (8 * posX / canvasWidth);
-			int touchY = (int) (8 * posY / canvasHeight);
-			channelToDraw = touchX + (8 * touchY);
-		}
 	}
 }
