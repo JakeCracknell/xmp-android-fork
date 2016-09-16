@@ -11,37 +11,15 @@ import android.os.RemoteException;
 import org.helllabs.android.xmp.R;
 import org.helllabs.android.xmp.service.ModInterface;
 
-public class PianoRollViewer extends Viewer {
-	private static final int MAX_NOTES = 96;
-	private static final int MAX_CHANNELS = 64;
+public class PianoRollViewer extends AbstractPianoRollViewer {
 	private static final float NOTE_RADIUS_COEFFICIENT = 0.4f;
 	private static final int DRAW_ALL_CHANNELS_CODE = -1;
-	private static final boolean ROUNDED_RECTANGLES_ENABLED = false;
-	private final Paint[] noteFillPaint = new Paint[MAX_CHANNELS];
-	private final Paint[] noteOutlinePaint = new Paint[MAX_CHANNELS];
-	private final Paint barPaint;
+
 	private final int backgroundColor = Color.BLACK;
-	private final byte[] rowNotes = new byte[64];
-	private final byte[] rowInstruments = new byte[64];
-	private int oldRow, oldOrd, oldPosX;
 	private int channelToDraw = DRAW_ALL_CHANNELS_CODE;
 
 	public PianoRollViewer(final Context context) {
 		super(context);
-
-		for (int channel = 0; channel < MAX_CHANNELS; channel += 8) {
-			setupChannelPaint(channel + 0, getResources().getColor(R.color.track0_color));
-			setupChannelPaint(channel + 1, getResources().getColor(R.color.track1_color));
-			setupChannelPaint(channel + 2, getResources().getColor(R.color.track2_color));
-			setupChannelPaint(channel + 3, getResources().getColor(R.color.track3_color));
-			setupChannelPaint(channel + 4, getResources().getColor(R.color.track4_color));
-			setupChannelPaint(channel + 5, getResources().getColor(R.color.track5_color));
-			setupChannelPaint(channel + 6, getResources().getColor(R.color.track6_color));
-			setupChannelPaint(channel + 7, getResources().getColor(R.color.track7_color));
-		}
-
-		barPaint = new Paint();
-		barPaint.setARGB(50, 255, 255, 255);
 	}
 	
 	@Override
@@ -85,16 +63,6 @@ public class PianoRollViewer extends Viewer {
 				surfaceHolder.unlockCanvasAndPost(canvas);
 			}
 		}
-	}
-
-	private void setupChannelPaint(int channel, int color) {
-		noteFillPaint[channel] = new Paint();
-		noteFillPaint[channel].setColor(color);
-		noteFillPaint[channel].setAntiAlias(true);
-		noteOutlinePaint[channel] = new Paint();
-		noteOutlinePaint[channel].setColor(color);
-		noteOutlinePaint[channel].setAntiAlias(true);
-		noteOutlinePaint[channel].setStyle(Paint.Style.STROKE);
 	}
 
 	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {

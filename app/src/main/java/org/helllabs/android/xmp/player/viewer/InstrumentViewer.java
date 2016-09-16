@@ -60,11 +60,6 @@ public class InstrumentViewer extends Viewer {
 		
 		setMaxY(insNum * fontHeight + fontHeight / 2);
 	}
-	
-	//@Override
-	//public void setRotation(final int val) {
-	//	super.setRotation(val);
-	//}
 
 	@Override
 	public void update(final Info info, final boolean paused) {

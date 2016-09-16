@@ -28,4 +28,5 @@ public final class Util {
 		res[0] = hexDigits[val >> 4];
 		res[1] = hexDigits[val & 0x0f];
 	}
+
 }
