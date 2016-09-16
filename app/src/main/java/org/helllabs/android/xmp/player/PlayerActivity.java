@@ -6,6 +6,7 @@ import java.util.List;
 import org.helllabs.android.xmp.R;
 import org.helllabs.android.xmp.XmpApplication;
 import org.helllabs.android.xmp.browser.PlaylistMenu;
+import org.helllabs.android.xmp.player.viewer.ChannelPianoRollViewer;
 import org.helllabs.android.xmp.player.viewer.ChannelViewer;
 import org.helllabs.android.xmp.player.viewer.InstrumentViewer;
 import org.helllabs.android.xmp.player.viewer.PatternViewer;
@@ -98,6 +99,7 @@ public class PlayerActivity extends Activity {
 	private Viewer channelViewer;
 	private Viewer patternViewer;
 	private Viewer pianoRollViewer;
+	private ChannelPianoRollViewer channelPianoRollViewer;
 	private int playTime;
 	private final Object playerLock = new Object();		// for sync
 	private Sidebar sidebar;
@@ -496,25 +498,28 @@ public class PlayerActivity extends Activity {
 
 	private void changeViewer() {
 		currentViewer++;
-		currentViewer %= 4;
+		currentViewer %= 5;
 
 		synchronized (viewerLayout) {
 			synchronized (playerLock) {
 				if (modPlayer != null) {
 					viewerLayout.removeAllViews();
 					switch (currentViewer) {
-					case 0:
-						viewer = instrumentViewer;
-						break;
-					case 1:
-						viewer = channelViewer;
-						break;
-					case 2:
-						viewer = patternViewer;
-						break;
-					case 3:
-						viewer = pianoRollViewer;
-						break;
+						case 0:
+							viewer = instrumentViewer;
+							break;
+						case 1:
+							viewer = channelViewer;
+							break;
+						case 2:
+							viewer = patternViewer;
+							break;
+						case 3:
+							viewer = pianoRollViewer;
+							break;
+						case 4:
+							viewer = channelPianoRollViewer;
+							break;
 					}
 
 					viewerLayout.addView(viewer);   		
@@ -792,6 +797,7 @@ public class PlayerActivity extends Activity {
 		channelViewer = new ChannelViewer(this);
 		patternViewer = new PatternViewer(this);
 		pianoRollViewer = new PianoRollViewer(this);
+		channelPianoRollViewer = new ChannelPianoRollViewer(this);
 	}
 
 

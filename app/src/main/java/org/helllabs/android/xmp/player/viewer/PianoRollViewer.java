@@ -31,41 +31,7 @@ public class PianoRollViewer extends AbstractPianoRollViewer {
 		oldPosX = -1;
 	}
 
-	@Override
-	public void update(final Info info, final boolean paused) {
-		super.update(info, paused);
-
-		final int row = info.values[2];
-		final int ord = info.values[0];
-
-		if (oldRow == row && oldOrd == ord && oldPosX == (int)posX) {
-			return;
-		}
-
-		final int numRows = info.values[3];
-		Canvas canvas = null;
-
-		if (numRows != 0) {		// Skip first invalid infos
-			oldRow = row;
-			oldOrd = ord;
-			oldPosX = (int)posX;
-		}
-
-		try {
-			canvas = surfaceHolder.lockCanvas(null);
-			if (canvas != null) {
-				synchronized (surfaceHolder) {
-					doDraw(canvas, modPlayer, info);
-				}
-			}
-		} finally {
-			if (canvas != null) {
-				surfaceHolder.unlockCanvasAndPost(canvas);
-			}
-		}
-	}
-
-	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
+	protected void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
 		final int channelCount = modVars[3];
 		final int currentPattern = info.values[1];
 		final int currentRow = info.values[2];

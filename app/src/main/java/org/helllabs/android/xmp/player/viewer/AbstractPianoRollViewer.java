@@ -1,9 +1,11 @@
 package org.helllabs.android.xmp.player.viewer;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import org.helllabs.android.xmp.R;
+import org.helllabs.android.xmp.service.ModInterface;
 
 public abstract class AbstractPianoRollViewer extends Viewer {
     protected static final int MAX_CHANNELS = 64;
@@ -47,4 +49,40 @@ public abstract class AbstractPianoRollViewer extends Viewer {
         noteOutlinePaint[channel].setAntiAlias(true);
         noteOutlinePaint[channel].setStyle(Paint.Style.STROKE);
     }
+
+    @Override
+    public void update(final Info info, final boolean paused) {
+        super.update(info, paused);
+
+        final int row = info.values[2];
+        final int ord = info.values[0];
+
+        if (oldRow == row && oldOrd == ord && oldPosX == (int)posX) {
+            return;
+        }
+
+        final int numRows = info.values[3];
+        Canvas canvas = null;
+
+        if (numRows != 0) {		// Skip first invalid infos
+            oldRow = row;
+            oldOrd = ord;
+            oldPosX = (int)posX;
+        }
+
+        try {
+            canvas = surfaceHolder.lockCanvas(null);
+            if (canvas != null) {
+                synchronized (surfaceHolder) {
+                    doDraw(canvas, modPlayer, info);
+                }
+            }
+        } finally {
+            if (canvas != null) {
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
+        }
+    }
+
+    protected abstract void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info);
 }

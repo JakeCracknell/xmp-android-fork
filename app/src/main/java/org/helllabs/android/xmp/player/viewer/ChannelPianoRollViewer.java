@@ -118,29 +118,6 @@ public class ChannelPianoRollViewer extends AbstractPianoRollViewer {
 			channelNumber[i] = new String(c);
 		}
 	}
-
-	@Override
-	public void update(final Info info, final boolean paused) {
-		super.update(info, paused);
-		
-		Canvas canvas = null;
-
-		try {
-			canvas = surfaceHolder.lockCanvas(null);
-			if (canvas != null) {
-				synchronized (surfaceHolder) {
-					doDraw(canvas, modPlayer, info, paused);
-				}
-			}
-		} finally {
-			// do this in a finally so that if an exception is thrown
-			// during the above, we don't leave the Surface in an
-			// inconsistent state
-			if (canvas != null) {
-				surfaceHolder.unlockCanvasAndPost(canvas);
-			}
-		}
-	}
 	
 	private int findScope(final int x, final int y) {		
 		final int chn = modVars[3];
@@ -289,8 +266,9 @@ public class ChannelPianoRollViewer extends AbstractPianoRollViewer {
 			}
 		}
 	}
-	
-	private void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info, final boolean paused) {
+
+	@Override
+	protected void doDraw(final Canvas canvas, final ModInterface modPlayer, final Info info) {
 		final int numChannels = modVars[3];
 		final int numInstruments = modVars[4];
 		final int row = info.values[2];
@@ -336,7 +314,7 @@ public class ChannelPianoRollViewer extends AbstractPianoRollViewer {
 			} else {
 				canvas.drawRect(rect, scopePaint);
 	
-				if (!paused) {
+				if (true) {
 					try {	
 				
 						// Be very careful here!
